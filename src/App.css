@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+.App {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Tailwind-like utilities */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+.gap-8 {
+  gap: 2rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-extrabold {
+  font-weight: 800;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-xl {
+  border-radius: 0.75rem;
+}
+
+.rounded-2xl {
+  border-radius: 1rem;
+}
+
+.rounded-3xl {
+  border-radius: 1.5rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Animations */
+@keyframes blob {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+  }
+  33% { 
+    transform: translate(30px, -50px) scale(1.1); 
+  }
+  66% { 
+    transform: translate(-20px, 20px) scale(0.9); 
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes bounce {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.5; 
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+/* Custom marker animation */
+@keyframes markerPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.4; 
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.3); 
+    opacity: 0; 
+  }
+}
+
+@keyframes markerBounce {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .md\\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .md\\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .md\\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .md\\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
