@@ -3,7 +3,9 @@ import axios from 'axios';
 import { Bus, User, Navigation, AlertCircle, Radio, QrCode } from 'lucide-react';
 import './App.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/bus';
+const API_URL =  process.env.REACT_APP_API_URL ;
+// ||'http://localhost:5000/api/bus'
+
 
 function App() {
   const [busNumber, setBusNumber] = useState('');
