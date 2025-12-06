@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Bus, Mail, Lock, LogIn, AlertCircle, X } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/api/driver';
-// process.env.REACT_APP_API_URL || 
+const API_URL =process.env.REACT_APP_API_URL || 
+ 'http://localhost:5000/api/driver';
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
