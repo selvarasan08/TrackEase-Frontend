@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Bus, Mail, Lock, LogIn, AlertCircle, X } from 'lucide-react';
 
-const API_URL =process.env.REACT_APP_API_URL || 
- 'http://localhost:5000/api';
+const API_URL ="https://trackease-backend-teq8.onrender.com/api ";
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -10,31 +9,35 @@ function Login({ onLoginSuccess }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    try {
-      const response = await fetch(`${API_URL}/driver/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+  try {
+    const response = await fetch(`${API_URL}/drivers/login`, {  // ✅ Fixed path
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      onLoginSuccess(data.driver, data.token);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(data.error || 'Login failed');
     }
-  };
+
+    // Store token and driver data
+    localStorage.setItem('driverToken', data.token);
+    localStorage.setItem('driverId', data.driver.id);
+    
+    onLoginSuccess(data.driver, data.token);
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-cyan-50 overflow-hidden flex items-center justify-center">
