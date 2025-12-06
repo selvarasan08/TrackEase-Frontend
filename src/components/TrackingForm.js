@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bus, User, Navigation, MapPin, Smartphone, Gauge, Zap } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL ="https://trackease-backend-teq8.onrender.com/api ";
 
 function TrackingForm({ driverInfo, onStartTracking, onError }) {
   const [busNumber, setBusNumber] = useState('');
