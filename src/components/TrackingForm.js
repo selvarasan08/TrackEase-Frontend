@@ -1,73 +1,82 @@
 import React, { useState } from 'react';
 import { Bus, User, Navigation, MapPin, Smartphone, Gauge, Zap } from 'lucide-react';
 
-const API_URL ="https://trackease-backend-teq8.onrender.com/api ";
+const API_URL ="https://trackease-backend-teq8.onrender.com/api";
 
 function TrackingForm({ driverInfo, onStartTracking, onError }) {
   const [busNumber, setBusNumber] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!busNumber.trim()) {
-      onError('Please enter bus number');
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!busNumber.trim()) {
+    onError('Please enter bus number');
+    return;
+  }
 
-    setLoading(true);
-    onError('');
+  setLoading(true);
+  onError('');
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const response = await fetch(`${API_URL}/bus/start-tracking`, {
-              method: 'POST',
-              headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('driverToken')}`
-              },
-              body: JSON.stringify({
-                busNumber: busNumber.trim(),
-                driverName: driverInfo.name,
-                driverId: driverInfo.id,
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-              })
-            });
+  const token = localStorage.getItem('driverToken');
+  if (!token) {
+    setLoading(false);
+    onError('Please login again');
+    return;
+  }
 
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || 'Failed to start tracking');
-            }
-
-            const data = await response.json();
-            onStartTracking({
-              busNumber: busNumber.trim(),
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          console.log('🚀 Starting tracking with token:', token.substring(0, 20) + '...');
+          
+          const response = await fetch(`${API_URL}/bus/start-tracking`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`  // ✅ Bearer token
+            },
+            body: JSON.stringify({
+              busNumber: busNumber.trim().toUpperCase(),
               driverName: driverInfo.name,
-              qrCode: data.qrCode,
-              initialLocation: {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              }
-            });
-          } catch (error) {
-            onError(error.message);
-          } finally {
-            setLoading(false);
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          });
+
+          console.log('📡 Response status:', response.status);  // Debug
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Server error: ${response.status}`);
           }
-        },
-        (error) => {
-          onError('Unable to access location: ' + error.message);
+
+          const data = await response.json();
+          onStartTracking({
+            busNumber: busNumber.trim(),
+            driverName: driverInfo.name,
+            qrCode: data.qrCode,
+            initialLocation: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            }
+          });
+        } catch (error) {
+          console.error('Start tracking error:', error);
+          onError(error.message);
+        } finally {
           setLoading(false);
         }
-      );
-    } else {
-      onError('Geolocation is not supported');
-      setLoading(false);
-    }
-  };
+      },
+      (error) => {
+        onError('Unable to access GPS: ' + error.message);
+        setLoading(false);
+      }
+    );
+  }
+};
+
 
   return (
     <div className="relative">
