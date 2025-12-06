@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bus, Mail, Lock, LogIn, AlertCircle, X } from 'lucide-react';
 
 const API_URL =process.env.REACT_APP_API_URL || 
- 'http://localhost:5000/api/driver';
+ 'http://localhost:5000/api';
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -16,7 +16,7 @@ function Login({ onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetch(`${API_URL}/driver/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bus, User, Navigation, MapPin, Smartphone, Gauge, Zap } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/bus';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function TrackingForm({ driverInfo, onStartTracking, onError }) {
   const [busNumber, setBusNumber] = useState('');
@@ -22,7 +22,7 @@ function TrackingForm({ driverInfo, onStartTracking, onError }) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
-            const response = await fetch(`${API_URL}/start-tracking`, {
+            const response = await fetch(`${API_URL}/bus/start-tracking`, {
               method: 'POST',
               headers: { 
                 'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ import {
   QrCode, Smartphone, Download, Share2, X 
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/bus';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 function TrackingView({ trackingData, driverInfo, onStopTracking, onError }) {
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -32,7 +32,7 @@ useEffect(() => {
   const resumeTracking = async () => {
     try {
       const token = localStorage.getItem('driverToken');
-      await fetch(`${API_URL}/resume-tracking`, {
+      await fetch(`${API_URL}/bus/resume-tracking`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -378,7 +378,7 @@ useEffect(() => {
       const token = localStorage.getItem('driverToken');
       if (!token) return;
 
-      await fetch(`${API_URL}/update-location`, {
+      await fetch(`${API_URL}/bus/update-location`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -400,7 +400,7 @@ useEffect(() => {
     setLoading(true);
     try {
       const token = localStorage.getItem('driverToken');
-      await fetch(`${API_URL}/stop-tracking`, {
+      await fetch(`${API_URL}/bus/stop-tracking`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
