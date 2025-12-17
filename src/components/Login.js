@@ -1,7 +1,8 @@
+// src/components/Login.jsx
 import React, { useState } from 'react';
 import { Bus, Mail, Lock, LogIn, AlertCircle, X } from 'lucide-react';
 
-const API_URL ="https://trackease-backend-teq8.onrender.com/api";
+const API_URL = "https://trackease-backend-teq8.onrender.com/api";
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -9,43 +10,50 @@ function Login({ onLoginSuccess }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  try {
-    const response = await fetch(`${API_URL}/drivers/login`, {  // ✅ Fixed path
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
+    try {
+      const response = await fetch(`${API_URL}/drivers/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || 'Login failed');
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      // Store token and driver data
+      localStorage.setItem('driverToken', data.token);
+      localStorage.setItem('driverId', data.driver.id);
+
+      onLoginSuccess(
+        {
+          id: data.driver.id,
+          name: data.driver.name,
+          email: data.driver.email
+        },
+        data.token
+      );
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-
-    // Store token and driver data
-    localStorage.setItem('driverToken', data.token);
-    localStorage.setItem('driverId', data.driver.id);
-    
-    onLoginSuccess(data.driver, data.token);
-  } catch (error) {
-    setError(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-cyan-50 overflow-hidden flex items-center justify-center">
       {/* Animated background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-20 w-96 h-96 bg-violet-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-20 left-1/3 w-96 h-96 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-20 left-1/3 w-96 h-96 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Login Card */}
@@ -53,7 +61,7 @@ const handleSubmit = async (e) => {
         <div className="relative">
           {/* Glow effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-[2rem] blur-2xl opacity-20"></div>
-          
+
           {/* Card */}
           <div className="relative bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
             {/* Header */}
@@ -89,7 +97,7 @@ const handleSubmit = async (e) => {
 
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
-              {/* Email Input */}
+              {/* Email */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
                   <Mail className="w-5 h-5 text-violet-600" />
@@ -105,7 +113,7 @@ const handleSubmit = async (e) => {
                 />
               </div>
 
-              {/* Password Input */}
+              {/* Password */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
                   <Lock className="w-5 h-5 text-violet-600" />
@@ -121,7 +129,7 @@ const handleSubmit = async (e) => {
                 />
               </div>
 
-              {/* Login Button */}
+              {/* Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -140,7 +148,6 @@ const handleSubmit = async (e) => {
                 )}
               </button>
 
-              {/* Info Text */}
               <div className="text-center pt-4">
                 <p className="text-sm text-slate-600">
                   Don't have an account?{' '}

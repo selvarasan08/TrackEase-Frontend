@@ -1,87 +1,93 @@
+// src/components/TrackingForm.jsx
 import React, { useState } from 'react';
-import { Bus, User, Navigation, MapPin, Smartphone, Gauge, Zap } from 'lucide-react';
+import { Bus, User, Navigation, MapPin, Smartphone, Gauge, Zap, ArrowRight } from 'lucide-react';
 
-const API_URL ="https://trackease-backend-teq8.onrender.com/api";
+const API_URL = "https://trackease-backend-teq8.onrender.com/api";
 
 function TrackingForm({ driverInfo, onStartTracking, onError }) {
   const [busNumber, setBusNumber] = useState('');
+  const [fromStage, setFromStage] = useState('');
+  const [toStage, setToStage] = useState('');
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!busNumber.trim()) {
-    onError('Please enter bus number');
-    return;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  setLoading(true);
-  onError('');
+    if (!busNumber.trim()) {
+      onError('Please enter bus number');
+      return;
+    }
+    if (!fromStage.trim() || !toStage.trim()) {
+      onError('Please enter from and to stages');
+      return;
+    }
 
-  const token = localStorage.getItem('driverToken');
-  if (!token) {
-    setLoading(false);
-    onError('Please login again');
-    return;
-  }
+    setLoading(true);
+    onError('');
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          console.log('🚀 Starting tracking with token:', token.substring(0, 20) + '...');
-          
-          const response = await fetch(`${API_URL}/bus/start-tracking`, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`  // ✅ Bearer token
-            },
-            body: JSON.stringify({
+    const token = localStorage.getItem('driverToken');
+    if (!token) {
+      setLoading(false);
+      onError('Please login again');
+      return;
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const response = await fetch(`${API_URL}/bus/start-tracking`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                busNumber: busNumber.trim().toUpperCase(),
+                driverName: driverInfo.name,
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                fromStage: fromStage.trim(),
+                toStage: toStage.trim()
+              })
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || `Server error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            onStartTracking({
               busNumber: busNumber.trim().toUpperCase(),
               driverName: driverInfo.name,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            })
-          });
-
-          console.log('📡 Response status:', response.status);  // Debug
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `Server error: ${response.status}`);
+              qrCode: data.qrCode,
+              fromStage: fromStage.trim(),
+              toStage: toStage.trim(),
+              initialLocation: {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              }
+            });
+          } catch (error) {
+            console.error('Start tracking error:', error);
+            onError(error.message);
+          } finally {
+            setLoading(false);
           }
-
-          const data = await response.json();
-          onStartTracking({
-            busNumber: busNumber.trim(),
-            driverName: driverInfo.name,
-            qrCode: data.qrCode,
-            initialLocation: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            }
-          });
-        } catch (error) {
-          console.error('Start tracking error:', error);
-          onError(error.message);
-        } finally {
+        },
+        (error) => {
+          onError('Unable to access GPS: ' + error.message);
           setLoading(false);
         }
-      },
-      (error) => {
-        onError('Unable to access GPS: ' + error.message);
-        setLoading(false);
-      }
-    );
-  }
-};
-
+      );
+    }
+  };
 
   return (
     <div className="relative">
       <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-[2rem] blur-2xl opacity-20"></div>
-      
+
       <div className="relative bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
         <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 p-6 sm:p-8">
           <div className="flex items-center gap-4 mb-2">
@@ -98,6 +104,42 @@ const handleSubmit = async (e) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+          {/* From/To route hint */}
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-2">
+            <p className="text-xs font-semibold text-slate-600 mb-2">
+              Route Information
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="flex-1">
+                <label className="text-xs font-bold text-slate-700 mb-1 block">From Stage</label>
+                <input
+                  type="text"
+                  value={fromStage}
+                  onChange={(e) => setFromStage(e.target.value)}
+                  placeholder="e.g., Tambaram"
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                />
+              </div>
+              <ArrowRight className="w-6 h-6 text-violet-500 hidden sm:block" />
+              <div className="flex-1">
+                <label className="text-xs font-bold text-slate-700 mb-1 block">To Stage</label>
+                <input
+                  type="text"
+                  value={toStage}
+                  onChange={(e) => setToStage(e.target.value)}
+                  placeholder="e.g., Chengalpattu"
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                />
+              </div>
+            </div>
+            {fromStage && toStage && (
+              <p className="mt-3 text-xs font-semibold text-violet-700">
+                This bus is running from <span className="font-black">{fromStage}</span> to <span className="font-black">{toStage}</span>.
+              </p>
+            )}
+          </div>
+
+          {/* Bus number */}
           <div>
             <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
               <Bus className="w-5 h-5 text-violet-600" />
@@ -111,10 +153,11 @@ const handleSubmit = async (e) => {
               className="w-full px-6 py-4 border-2 border-slate-200 rounded-2xl text-lg font-medium focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 transition-all shadow-sm"
             />
             <p className="mt-2 text-xs text-slate-500 font-medium">
-              Enter full registration (TN01AB1234) or route number (123)
+              Use the same bus number to resume or stop live tracking later.
             </p>
           </div>
 
+          {/* Driver name */}
           <div>
             <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-3">
               <User className="w-5 h-5 text-violet-600" />
@@ -128,6 +171,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             disabled={loading || !busNumber.trim()}
@@ -146,6 +190,7 @@ const handleSubmit = async (e) => {
             )}
           </button>
 
+          {/* Info cards */}
           <div className="grid sm:grid-cols-3 gap-4 pt-4">
             <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-4">
               <div className="flex items-start gap-3">
